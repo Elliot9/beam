@@ -56,7 +56,7 @@ std::wstring FsJoin(const std::wstring& dir, const std::wstring& name) { return 
 namespace {
 
 constexpr size_t kMaxRecords = 30;
-constexpr wchar_t kBeamVersion[] = L"1.2.0";
+constexpr wchar_t kBeamVersion[] = L"1.2.4";
 
 std::wstring FirstLine(const std::string& utf8, size_t max = 160) {
     std::wstring text = Trim(Utf8ToWide(utf8));

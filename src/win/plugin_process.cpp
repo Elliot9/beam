@@ -356,6 +356,12 @@ std::wstring ResolveCommandLine(const std::wstring& run, const std::wstring& fol
         if (ext == L".bat" || ext == L".cmd") return CmdInvocation(local, rest);
         return join(q);
     }
+    // A batch file named with its extension ("tool.cmd"): CreateProcess would run it through cmd.exe
+    // anyway, so say so - QueryUnsafeIn then keeps {query} out of a line cmd parses as code.
+    if (ext == L".bat" || ext == L".cmd") {
+        const std::wstring script = SearchPathFor(first, nullptr);
+        if (!script.empty()) return CmdInvocation(script, rest);
+    }
     // A program on PATH. CreateProcess only appends ".exe"; .cmd/.bat shims (npm, npx, code...) need cmd.exe.
     if (ext != L".exe" && ext != L".com" && SearchPathFor(first, L".exe").empty()) {
         std::wstring shim = SearchPathFor(first, L".cmd");

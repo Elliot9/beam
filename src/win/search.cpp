@@ -90,6 +90,22 @@ bool IsAbsolute(const std::wstring& p) {
     return p.size() > 2 && ((p[1] == L':' && p[2] == L'\\') || (p[0] == L'\\' && p[1] == L'\\'));
 }
 
+// Quicklink arguments as on Linux: split first, then {query} goes into each argument, so the typed
+// text stays inside its argument even with spaces or quotes ("D:\src\{query}" -> "D:\src\my app").
+std::wstring FillArguments(const std::wstring& arguments, const std::wstring& query) {
+    if (Trim(arguments).empty()) return arguments;
+    int argc = 0;
+    LPWSTR* argv = CommandLineToArgvW((L"x " + arguments).c_str(), &argc);  // argv[0] has its own rules
+    if (!argv) return FillTemplate(arguments, query, false);
+    std::wstring out;
+    for (int i = 1; i < argc; ++i) {
+        if (!out.empty()) out.push_back(L' ');
+        out += QuoteArgument(FillTemplate(argv[i], query, false));
+    }
+    LocalFree(argv);
+    return out;
+}
+
 // Moves a favorite one visible step: until it passes `neighbor` (hidden entries, e.g.
 // apps not indexed yet, are skipped over so every key press visibly moves the row).
 bool MoveFavoritePast(FavoritesStore& favorites, const std::wstring& key, const std::wstring& neighbor, int direction) {
@@ -545,7 +561,7 @@ ResultItem SearchService::QuicklinkItem(const Quicklink& link, const std::wstrin
         item.icon = absolute ? ShellIcon(path) : GlyphIcon(glyph::kLink, tint::kQuicklink);
     }
     const std::wstring target = FillTemplate(link.target, argument, isUrl);
-    const std::wstring args = FillTemplate(link.arguments, argument, false);
+    const std::wstring args = FillArguments(link.arguments, argument);
     const std::wstring keyword = link.keyword;
     const bool admin = link.runAsAdmin;
     item.actions.push_back(Action{L"開啟", glyph::kOpen, Keys(VK_RETURN), false,

@@ -10,6 +10,8 @@ BEAM=${BEAM:-$HERE/../../build-linux/beam}
 OUT=${OUT:-/tmp/beam-gnome-tests/out}
 # No journal here: Beam reads gsd-media-keys' messages through fakebin/journalctl (from gsd.log).
 export PATH=$HERE/fakebin:$PATH BEAM_TEST_GSD_LOG=$OUT/gsd.log
+# Beam runs from the build folder here, not /usr/bin: let the window-switcher extension accept it.
+export BEAM_WINDOWS_ALLOW_UNINSTALLED=1
 
 # D-Bus-activated services (dconf-service!) must see the same HOME / XDG dirs as the clients.
 init_env() {

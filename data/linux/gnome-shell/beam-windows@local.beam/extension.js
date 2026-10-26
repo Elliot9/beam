@@ -3,8 +3,11 @@
 //
 //   org.gnome.Shell  /local/beam/Windows  local.beam.Windows.List / Activate / Close
 //
-// Wayland keeps programs from seeing each other's windows on purpose, so only the Beam
-// launcher (a process whose executable is called "beam") may use the interface.
+// Wayland keeps programs from seeing each other's windows on purpose, so only the installed
+// Beam launcher may use the interface: a process running an executable called "beam" that only
+// root can change (/usr/bin/beam), so another program cannot pass by copying itself to a file
+// with that name. Beam run from a build folder is refused unless GNOME Shell was started with
+// BEAM_WINDOWS_ALLOW_UNINSTALLED=1 (the GNOME integration tests do that).
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
@@ -40,42 +43,72 @@ function findWindow(id) {
     return windowList().find(w => String(w.get_id()) === id) ?? null;
 }
 
+// Owned by root and writable by nobody else: a file or folder another user-level program cannot change.
+function rootOwned(path, type) {
+    const info = Gio.File.new_for_path(path).query_info('standard::type,unix::uid,unix::mode',
+        Gio.FileQueryInfoFlags.NONE, null);
+    return info.get_file_type() === type && info.get_attribute_uint32('unix::uid') === 0 &&
+        (info.get_attribute_uint32('unix::mode') & 0o022) === 0;
+}
+
+function isBeamProcess(pid, allowUninstalled) {
+    // "/usr/bin/beam", or "/usr/bin/beam (deleted)" right after a package upgrade
+    const exe = GLib.file_read_link(`/proc/${pid}/exe`).replace(/ \(deleted\)$/, '');
+    if (GLib.path_get_basename(exe) !== 'beam')
+        return false;
+    if (allowUninstalled)
+        return true;
+    // /proc/<pid>/exe is the file the process really runs, even if its path was replaced since.
+    return rootOwned(`/proc/${pid}/exe`, Gio.FileType.REGULAR) &&
+        rootOwned(GLib.path_get_dirname(exe), Gio.FileType.DIRECTORY);
+}
+
 class WindowService {
     constructor() {
         this._allowed = new Set();  // unique bus names already checked (never reused on a bus)
+        this._allowUninstalled = GLib.getenv('BEAM_WINDOWS_ALLOW_UNINSTALLED') === '1';
     }
 
     get Version() {
         return 2;
     }
 
-    _callerIsBeam(invocation) {
+    // Asynchronous, so a slow bus never stalls GNOME Shell.
+    _checkCaller(invocation, done) {
         const sender = invocation.get_sender();
-        if (this._allowed.has(sender))
-            return true;
-        try {
-            const reply = Gio.DBus.session.call_sync('org.freedesktop.DBus', '/org/freedesktop/DBus',
-                'org.freedesktop.DBus', 'GetConnectionUnixProcessID', new GLib.Variant('(s)', [sender]),
-                new GLib.VariantType('(u)'), Gio.DBusCallFlags.NONE, 1000, null);
-            const [pid] = reply.deepUnpack();
-            // "/usr/bin/beam", or "/usr/bin/beam (deleted)" right after a package upgrade
-            const exe = GLib.file_read_link(`/proc/${pid}/exe`).replace(/ \(deleted\)$/, '');
-            if (GLib.path_get_basename(exe) !== 'beam')
-                return false;
-            this._allowed.add(sender);
-            return true;
-        } catch (e) {
-            return false;
+        if (this._allowed.has(sender)) {
+            done(true);
+            return;
         }
+        Gio.DBus.session.call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
+            'GetConnectionUnixProcessID', new GLib.Variant('(s)', [sender]), new GLib.VariantType('(u)'),
+            Gio.DBusCallFlags.NONE, 1000, null, (connection, result) => {
+                let ok = false;
+                try {
+                    const [pid] = connection.call_finish(result).deepUnpack();
+                    ok = isBeamProcess(pid, this._allowUninstalled);
+                } catch (e) {
+                    ok = false;
+                }
+                if (ok)
+                    this._allowed.add(sender);
+                done(ok);
+            });
     }
 
     _handle(invocation, signature, produce) {
-        if (!this._callerIsBeam(invocation)) {
-            invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied',
-                'Only the Beam launcher may use this interface');
-            return;
-        }
-        invocation.return_value(new GLib.Variant(signature, [produce()]));
+        this._checkCaller(invocation, ok => {
+            if (!ok) {
+                invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied',
+                    'Only the installed Beam launcher may use this interface');
+                return;
+            }
+            try {
+                invocation.return_value(new GLib.Variant(signature, [produce()]));
+            } catch (e) {
+                invocation.return_dbus_error('org.freedesktop.DBus.Error.Failed', String(e));
+            }
+        });
     }
 
     ListAsync(_params, invocation) {

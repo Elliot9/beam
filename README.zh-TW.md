@@ -11,7 +11,8 @@
 
 ## 使用
 
-1. Windows：執行 `Beam.exe`，第一次會開設定視窗，之後常駐在系統匣。Linux：從應用程式清單開啟「Beam」。
+1. 從 [Releases](../../releases) 下載：Windows 是 `Beam-1.2.4-windows-x64.zip`（先在內容中「解除封鎖」再解壓縮，把 `Beam` 資料夾放到自己的位置，例如 `%LOCALAPPDATA%\Programs\Beam\`），Linux 是 `beam-launcher_1.2.4_amd64.deb`（安裝方式見〈[Linux](#linuxubuntu-2604--gnome)〉）。
+   Windows：執行 `Beam.exe`，第一次會開設定視窗，之後常駐在系統匣。Linux：從應用程式清單開啟「Beam」。
 2. 按 **Alt+Space**（可改）叫出 Beam，開始輸入。
 
 | 輸入 | 結果 |
@@ -137,7 +138,7 @@ sudo apt install ./beam-launcher_1.2.4_amd64.deb
 - `> 指令` 用 bash 在預設終端機（Ptyxis / GNOME 終端機…）執行，結束後留在 shell；Ctrl+Enter 在背景執行，Ctrl+Shift+Enter 加上 sudo。
 - 應用程式的 Ctrl+K 面板會列出 desktop 檔裡的動作（例如瀏覽器的「開新視窗」「無痕視窗」）。
 - 外掛範本是 Python / Node.js / Shell（bash）；`run` 的規則見 PLUGINS.md。
-- 視窗列表、切換和關閉都經過 GNOME Shell 擴充功能。它在 GNOME Shell 裡提供一個 D-Bus 介面（`/local/beam/Windows`），只接受 Beam 本身的呼叫，其他程式來問會被拒絕（Wayland 本來就不讓程式看到別的程式的視窗）。
+- 視窗列表、切換和關閉都經過 GNOME Shell 擴充功能。它在 GNOME Shell 裡提供一個 D-Bus 介面（`/local/beam/Windows`），只接受已安裝的 Beam（名叫 `beam`、只有 root 能修改的執行檔，例如 `/usr/bin/beam`）呼叫，其他程式來問會被拒絕（Wayland 本來就不讓程式看到別的程式的視窗）。所以直接從建置資料夾執行的 `beam` 不能切換視窗，要先安裝。
 - Beam 打開時會蓋住整個工作區（透明，只看得到中間的面板），點面板外面就會關閉。切換輸入法（Super+Space）不會關閉 Beam。
 
 ### 解除安裝

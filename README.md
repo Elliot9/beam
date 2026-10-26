@@ -54,19 +54,23 @@ Both versions share the same search, calculator, favorites, settings file and pl
 
 ### Windows
 
-1. Download `Beam.exe` (and `beam-plugin.exe` if you want to write plugins) from the [Releases](../../releases) page, or [build it yourself](#building-from-source).
-2. Put it in its own folder (for example `%LOCALAPPDATA%\Programs\Beam\`) and run `Beam.exe`.
-3. The first run opens the settings window. After that Beam lives in the system tray.
+1. Download `Beam-1.2.4-windows-x64.zip` from the [Releases](../../releases) page (or [build it yourself](#building-from-source)).
+2. Right-click the zip → **Properties → Unblock**, then extract the `Beam` folder somewhere of its own, for example `%LOCALAPPDATA%\Programs\Beam\`.
+3. Run `Beam.exe`. The first run opens the settings window; after that Beam lives in the system tray. (`beam-plugin.exe` is the command-line tool for plugin authors.)
 
-> The `.exe` is not code-signed, so SmartScreen may warn on first run: choose **More info → Run anyway**. If you downloaded a zip, right-click it → **Properties → Unblock** before extracting.
+> The `.exe` is not code-signed, so SmartScreen may warn on first run: choose **More info → Run anyway**.
 
 ### Linux
+
+Download `beam-launcher_1.2.4_amd64.deb` from the [Releases](../../releases) page, then:
 
 ```sh
 sudo apt install ./beam-launcher_1.2.4_amd64.deb
 ```
 
 Then open **Beam** from the app grid once. That first start registers the hotkey with GNOME; see [first start](#first-start) for details.
+
+> Each release also has a `SHA256SUMS.txt`. To check your download: `sha256sum -c SHA256SUMS.txt --ignore-missing`
 
 ## Usage
 
@@ -254,7 +258,7 @@ cmake --build build-linux
 packaging/linux/build-deb.sh build-linux    # creates beam-launcher_<version>_amd64.deb
 ```
 
-Needs GTK 4.14 or newer (Ubuntu 26.04 ships GTK 4.22 and GNOME 50). You can also `sudo cmake --install build-linux` instead of building a `.deb`.
+Needs GTK 4.14 or newer (Ubuntu 26.04 ships GTK 4.22 and GNOME 50). You can also `sudo cmake --install build-linux` instead of building a `.deb`. Window switching only works with an installed Beam: the extension refuses a `beam` run straight from the build folder.
 
 ### Tests
 
@@ -287,7 +291,7 @@ PLUGINS.md    Plugin protocol reference (also embedded in the binaries)
 - **Plugins are programs on your computer, and Beam runs them with your user permissions.** Only install plugins you trust, the same as any script you download.
 - Beam passes `{query}` to plugins as a single argument, without a shell. Where an argument would be run as code (`bash -c`, `python -c`, `cmd`, PowerShell without `-File`, …) Beam leaves `{query}` out. The safest way for a plugin to read the query is always stdin.
 - Plugin authors: if your plugin puts data from the internet into `open` or `run` actions, check it first. Beam executes those actions exactly as given.
-- **Window switcher extension (Linux):** it exposes a D-Bus interface inside GNOME Shell (`/local/beam/Windows`) that lists, focuses and closes windows, and it only answers the Beam process. That check is best effort; any program running as your user could get around it, so think of the extension as giving up some of Wayland's window privacy. If you don't need window switching, leave it disabled.
+- **Window switcher extension (Linux):** it exposes a D-Bus interface inside GNOME Shell (`/local/beam/Windows`) that lists, focuses and closes windows. It only answers the installed Beam program (an executable named `beam` that only root can change, such as `/usr/bin/beam`), so other apps can't simply pretend to be Beam. A program already running as your user could still find ways around it, so think of the extension as giving up a little of Wayland's window privacy. If you don't need window switching, leave it disabled.
 - Beam has **no telemetry and makes no network requests** of its own. URLs and web searches open in your browser.
 - `usage.json` stores which result you picked for which search text, locally, to improve ranking. Delete it anytime.
 

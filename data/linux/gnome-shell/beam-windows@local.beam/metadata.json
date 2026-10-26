@@ -3,5 +3,5 @@
   "name": "Beam Window Switcher",
   "description": "Lets the Beam launcher list and switch windows. On Wayland only GNOME Shell can see other programs' windows, so Beam asks this extension over D-Bus.",
   "shell-version": ["45", "46", "47", "48", "49", "50", "51", "52"],
-  "version-name": "1.2.0"
+  "version-name": "1.2.4"
 }
