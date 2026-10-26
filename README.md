@@ -9,7 +9,10 @@ Press a hotkey, start typing, and open apps, switch windows, run commands, do qu
 ![Language](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-<!-- SCREENSHOTS: drag the screenshots onto this line in GitHub's web editor (they are hosted by GitHub, not stored in the repo) -->
+<img width="1853" height="1048" alt="beam-search" src="https://github.com/user-attachments/assets/ef542760-26cd-43cf-a726-045d56308f84" />
+<img width="1853" height="1048" alt="beam-calculator" src="https://github.com/user-attachments/assets/c15bc86e-4ea1-403e-81e5-7bdcfa1eee98" />
+<img width="1853" height="1048" alt="beam-favorites" src="https://github.com/user-attachments/assets/ee7ef7eb-3e19-4b0e-8ea6-f3fc15737b88" />
+
 
 - **Windows 10 / 11**: native C++ (Win32 + Direct2D). One small `.exe`, no runtime to install.
 - **Linux (Ubuntu 26.04 / GNOME 50, Wayland)**: native C++ (GTK 4), installed as a `.deb`. See [Linux](#linux-ubuntu-2604--gnome).
