@@ -9,6 +9,8 @@ Press a hotkey, start typing, and open apps, switch windows, run commands, do qu
 ![Language](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+<!-- SCREENSHOTS: drag the screenshots onto this line in GitHub's web editor (they are hosted by GitHub, not stored in the repo) -->
+
 - **Windows 10 / 11**: native C++ (Win32 + Direct2D). One small `.exe`, no runtime to install.
 - **Linux (Ubuntu 26.04 / GNOME 50, Wayland)**: native C++ (GTK 4), installed as a `.deb`. See [Linux](#linux-ubuntu-2604--gnome).
 
