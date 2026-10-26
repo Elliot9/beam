@@ -1,0 +1,65 @@
+// Beam resources. User-visible dialog text is set at runtime (settings_dialog.cpp)
+// so this file stays ASCII and compiles the same with rc.exe and windres.
+#include <windows.h>
+#include "resource.h"
+
+IDI_APP ICON "beam.ico"
+
+// Plugin protocol documentation, written to %APPDATA%\Beam\plugins\PLUGINS.md on start.
+PLUGINS_MD RCDATA "PLUGINS.md"
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "beam.manifest"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,2,0,0
+ PRODUCTVERSION 1,2,0,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "Beam launcher"
+            VALUE "FileVersion", "1.2.0"
+            VALUE "InternalName", "Beam"
+            VALUE "OriginalFilename", "Beam.exe"
+            VALUE "ProductName", "Beam"
+            VALUE "ProductVersion", "1.2.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+IDD_SETTINGS DIALOGEX 0, 0, 320, 250
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Beam"
+FONT 9, "Segoe UI", 400, 0, 0x1
+BEGIN
+    LTEXT           "", IDC_WELCOME, 10, 9, 300, 20
+    GROUPBOX        "", IDC_GROUP_HOTKEYS, 7, 33, 306, 62
+    LTEXT           "", IDC_LABEL_MAIN, 16, 51, 92, 10
+    CONTROL         "", IDC_HOTKEY_MAIN, "BeamHotkeyBox", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 112, 47, 150, 17
+    LTEXT           "", IDC_LABEL_WINDOWS, 16, 74, 92, 10
+    CONTROL         "", IDC_HOTKEY_WINDOWS, "BeamHotkeyBox", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 112, 70, 150, 17
+    PUSHBUTTON      "", IDC_CLEAR_WINDOWS, 266, 70, 40, 17
+    GROUPBOX        "", IDC_GROUP_GENERAL, 7, 101, 306, 97
+    AUTOCHECKBOX    "", IDC_STARTUP, 16, 115, 290, 12
+    AUTOCHECKBOX    "", IDC_INCLUDE_WINDOWS, 16, 131, 290, 12
+    LTEXT           "", IDC_LABEL_THEME, 16, 153, 92, 10
+    COMBOBOX        IDC_THEME, 112, 150, 100, 60, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "", IDC_LABEL_ENGINE, 16, 176, 92, 10
+    EDITTEXT        IDC_ENGINE, 112, 173, 194, 14, ES_AUTOHSCROLL
+    PUSHBUTTON      "", IDC_EDIT_JSON, 7, 206, 110, 16
+    PUSHBUTTON      "", IDC_REINDEX, 121, 206, 90, 16
+    LTEXT           "", IDC_STATUS, 7, 227, 196, 20
+    DEFPUSHBUTTON   "", IDOK, 209, 228, 50, 16
+    PUSHBUTTON      "", IDCANCEL, 263, 228, 50, 16
+END

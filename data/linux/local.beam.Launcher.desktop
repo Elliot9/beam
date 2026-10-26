@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name=Beam
+GenericName=Launcher
+GenericName[zh_TW]=啟動器
+Comment=Search apps, windows, commands and plugins
+Comment[zh_TW]=搜尋應用程式、視窗、指令與外掛（Alt+Space）
+Exec=beam --show
+Icon=local.beam.Launcher
+Terminal=false
+Categories=Utility;GTK;
+Keywords=launcher;search;raycast;spotlight;alfred;
+Keywords[zh_TW]=啟動器;搜尋;launcher;raycast;
+StartupNotify=true
+SingleMainWindow=true
+X-GNOME-UsesNotifications=true

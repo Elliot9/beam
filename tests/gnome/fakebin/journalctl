@@ -1,0 +1,13 @@
+#!/bin/bash
+# Test stand-in for journalctl (the headless session has no journal): gsd-media-keys' messages from
+# the test's gsd.log ($BEAM_TEST_GSD_LOG) in journalctl's short-iso format; honours _PID=.
+pid=""
+for a in "$@"; do case $a in _PID=*) pid=${a#_PID=};; esac; done
+log=${BEAM_TEST_GSD_LOG:-}
+[ -n "$log" ] && [ -f "$log" ] || exit 0
+day=$(date +%Y-%m-%d)
+sed -nE 's/^\(gsd-media-keys:([0-9]+)\): [^*]*\*\*: ([0-9:]+)\.[0-9]+: (.*)$/\1 \2 \3/p' "$log" |
+while read -r p t msg; do
+    [ -n "$pid" ] && [ "$p" != "$pid" ] && continue
+    echo "${day}T${t}+00:00 testhost gsd-media-keys[$p]: $msg"
+done

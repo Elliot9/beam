@@ -1,0 +1,9 @@
+build*/
+*.user
+.vs/
+*.deb
+.vscode/
+.idea/
+.cache/
+compile_commands.json
+__pycache__/
